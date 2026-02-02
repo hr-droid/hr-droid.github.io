@@ -1,1 +1,0 @@
-# Regional Tax Calculation Applies VAT and GST based on the shipping address country code. - **Source:** `orders`, `ref_tax_rates` - **Logic:** Multiplies subtotal by `tax_rate` where `country_code` matches. - **Maintenance:** Handled via the finance reference table.
