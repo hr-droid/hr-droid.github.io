@@ -2,9 +2,9 @@ site_name: "Data Logic Portal"
 theme:
   name: material
   features:
-    - navigation.instant
     - search.suggest
     - search.highlight
-    - toc.integrate        # Puts the specific file's "Table of Contents" into the sidebar
+    - navigation.instant
 
-# No 'nav' section here. MkDocs will auto-list all 400 files.
+plugins:
+  - search  # This uses a stable, built-in search engine
