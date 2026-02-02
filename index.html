@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Data Logic Search</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.63.1/build/stlite.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.63.1/build/stlite.js"></script>
+    <script>
+      stlite.mount({
+        requirements: ["pandas"], // No heavy LLM libraries needed
+        entrypoint: "app.py",
+        files: {
+          "app.py": `
+import streamlit as st
+import pandas as pd
+
+st.set_page_config(page_title="Logic Explorer", layout="wide")
+
+# Mock data - In production, this would be a loaded JSON file
+data = [
+    {"file": "revenue_calc.md", "content": "Gross Revenue, SUM(price * quantity), Completed orders"},
+    {"file": "customer_churn.md", "content": "90 days inactivity, At Risk, last_order_date"},
+    {"file": "tax_compliance.md", "content": "VAT, GST, shipping address, country_code"}
+]
+
+st.title("🔍 Data Transformation Explorer")
+st.caption("Search across 400+ Windsurf-generated explanations")
+
+query = st.text_input("What logic are you looking for?", placeholder="e.g. How is tax calculated?")
+
+if query:
+    # Simple semantic-like search (Keyword matching for demo)
+    results = [d for d in data if query.lower() in d['content'].lower() or query.lower() in d['file'].lower()]
+    
+    if results:
+        for r in results:
+            with st.expander(f"📄 {r['file']}"):
+                st.markdown(f"**Explanation:** \\n {r['content']}")
+                st.button(f"View Full Code for {r['file']}", key=r['file'])
+    else:
+        st.warning("No matching logic found. Try broader terms like 'Revenue' or 'Tax'.")
+          `
+        }
+      }, document.getElementById("root"));
+    </script>
+  </body>
+</html>
