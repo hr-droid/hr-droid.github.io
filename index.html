@@ -1,51 +1,57 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Data Logic Search</title>
+    <title>Intelligent Data Logic Search</title>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.63.1/build/stlite.css" />
-  </head>
-  <body>
+</head>
+<body>
     <div id="root"></div>
     <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.63.1/build/stlite.js"></script>
     <script>
-      stlite.mount({
-        requirements: ["pandas"], // No heavy LLM libraries needed
+    stlite.mount({
         entrypoint: "app.py",
         files: {
-          "app.py": `
+        "app.py": `
 import streamlit as st
-import pandas as pd
+import json
+from pyodide.http import open_url
 
-st.set_page_config(page_title="Logic Explorer", layout="wide")
+st.set_page_config(page_title="Data Logic", layout="wide")
 
-# Mock data - In production, this would be a loaded JSON file
-data = [
-    {"file": "revenue_calc.md", "content": "Gross Revenue, SUM(price * quantity), Completed orders"},
-    {"file": "customer_churn.md", "content": "90 days inactivity, At Risk, last_order_date"},
-    {"file": "tax_compliance.md", "content": "VAT, GST, shipping address, country_code"}
+# 1. The Intelligence: Defining the Search logic
+# In a real app, this 'data' would be loaded from a static JSON file in your repo
+docs = [
+    {"title": "Revenue Transformation", "tags": "Finance, Sales", "content": "Calculates Gross Revenue using SUM(price * quantity)."},
+    {"title": "Customer Churn", "tags": "Retention, Marketing", "content": "Identifies users inactive for 90 days using DATEDIFF."},
+    {"title": "Tax Compliance", "tags": "Finance, Legal", "content": "Applies VAT/GST based on country_code."}
 ]
 
-st.title("🔍 Data Transformation Explorer")
-st.caption("Search across 400+ Windsurf-generated explanations")
+st.title("🔍 Intelligent Data Portal")
+st.markdown("### Search 400+ SQL Logic files with typo tolerance")
 
-query = st.text_input("What logic are you looking for?", placeholder="e.g. How is tax calculated?")
+query = st.text_input("Search by metric, table, or logic...", placeholder="Try typing 'revnue' or 'churn'")
 
 if query:
-    # Simple semantic-like search (Keyword matching for demo)
-    results = [d for d in data if query.lower() in d['content'].lower() or query.lower() in d['file'].lower()]
+    # We pass the query to Javascript's Fuse.js for 'Smart' processing
+    import js
+    options = js.JSON.parse('{"keys": [{"name": "title", "weight": 2}, "content", "tags"], "threshold": 0.3}')
+    fuse = js.Fuse.new(js.JSON.parse(json.dumps(docs)), options)
+    results = fuse.search(query)
     
     if results:
-        for r in results:
-            with st.expander(f"📄 {r['file']}"):
-                st.markdown(f"**Explanation:** \\n {r['content']}")
-                st.button(f"View Full Code for {r['file']}", key=r['file'])
+        st.write(f"Found {len(results)} matches:")
+        for res in results:
+            item = res.item
+            with st.expander(f"📄 {item.title}"):
+                st.info(f"**Tags:** {item.tags}")
+                st.markdown(item.content)
     else:
-        st.warning("No matching logic found. Try broader terms like 'Revenue' or 'Tax'.")
-          `
+        st.warning("No results found. Try a different term.")
+        `
         }
-      }, document.getElementById("root"));
+    }, document.getElementById("root"));
     </script>
-  </body>
+</body>
 </html>
