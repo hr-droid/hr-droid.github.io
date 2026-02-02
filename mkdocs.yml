@@ -1,21 +1,10 @@
-site_name: "Corporate Data Logic"
-site_description: "Central Source of Truth for SQL Transformations"
-
+site_name: "Data Logic Portal"
 theme:
   name: material
-  palette:
-    primary: indigo
-    accent: indigo
   features:
-    - navigation.instant    # Pages load without refreshing (Fast!)
-    - navigation.sections   # Groups files by folder in the sidebar
-    - navigation.expand     # Auto-expand the folders
-    - search.suggest        # Typo-friendly search suggestions
-    - search.highlight      # Highlights words in the result
+    - navigation.instant
+    - search.suggest
+    - search.highlight
+    - toc.integrate        # Puts the specific file's "Table of Contents" into the sidebar
 
-# NO 'nav' section here! 
-# By leaving 'nav' empty, MkDocs automatically builds the menu 
-# from your folder structure. This is the 'Zero Maintenance' secret.
-
-plugins:
-  - search
+# No 'nav' section here. MkDocs will auto-list all 400 files.
